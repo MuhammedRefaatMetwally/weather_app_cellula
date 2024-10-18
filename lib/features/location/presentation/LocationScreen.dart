@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather/features/ai_prediction/presentation/bloc/PredictionBloc.dart';
 import 'package:weather/features/home/ForeCastScreen.dart';
 import 'package:weather/features/home/presentation/bloc/ForecastBloc.dart';
 import 'package:weather/features/location/presentation/widgets/MapWidget.dart';
@@ -139,9 +140,16 @@ class LocationScreen extends StatelessWidget {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => BlocProvider(
-                                                create: (context) => getIt.get<ForecastBloc>(),
-                                                child: ForecastScreen(city: city)),
+                                            builder: (context) => MultiBlocProvider(
+                                              providers: [
+                                                BlocProvider(
+                                                create: (context) => getIt.get<ForecastBloc>()),
+
+                                                BlocProvider(
+                                                    create: (context) => getIt.get<PredictionBloc>()),
+                                              ],
+                                                  child: ForecastScreen(city: city),
+                                            ),
                                           ),
                                         );
                                       },

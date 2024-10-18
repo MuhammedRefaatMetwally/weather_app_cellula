@@ -4,6 +4,10 @@ import 'package:weather/features/home/presentation/bloc/ForecastBloc.dart';
 import 'package:weather/features/home/presentation/bloc/ForecastEvent.dart';
 import 'package:weather/features/home/presentation/bloc/ForecastState.dart';
 
+import '../ai_prediction/presentation/bloc/PredictionBloc.dart';
+import '../ai_prediction/presentation/bloc/PredictionEvent.dart';
+import '../ai_prediction/presentation/bloc/PredictionState.dart';
+
 
 class ForecastScreen extends StatefulWidget {
   final String city;
@@ -35,93 +39,126 @@ class _ForecastScreenState extends State<ForecastScreen> {
         ),
       ),
       // Gradient background for better aesthetics
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.deepPurple, Colors.black],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      body: BlocListener<PredictionBloc, PredictionState>(
+        listener: (context, state) {
+          if (state is PredictionLoaded) {
+            _showPredictionDialog(context, 'Prediction: ${state.prediction}');
+          } else if (state is PredictionError) {
+            _showPredictionDialog(context, 'Error: ${state.errorMessage}');
+          }
+        },
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepPurple, Colors.black],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              // Horizontal day selector
-              SizedBox(
-                height: 80,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 5,
-                  itemBuilder: (context, index) {
-                    return _buildDayCard(context, '${18 + index}', index == selectedDayIndex, index);
-                  },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                // Horizontal day selector
+                SizedBox(
+                  height: 80,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 5,
+                    itemBuilder: (context, index) {
+                      return _buildDayCard(context, '${18 + index}', index == selectedDayIndex, index);
+                    },
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Main weather display
-              Expanded(
-                child: BlocBuilder<ForecastBloc, ForecastState>(
-                  builder: (context, state) {
-                    if (state is ForecastLoading) {
-                      return const Center(child: CircularProgressIndicator(color: Colors.white));
-                    } else if (state is ForecastLoaded) {
-                      final forecast = state.forecast.forecast.forecastDays[selectedDayIndex];
-                      return Column(
-                        children: [
-                          const SizedBox(height: 16),
-                          // Weather condition text
-                          Text(
-                            forecast.day.condition.text ?? '',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                // Main weather display
+                Expanded(
+                  child: BlocBuilder<ForecastBloc, ForecastState>(
+                    builder: (context, state) {
+                      if (state is ForecastLoading) {
+                        return const Center(child: CircularProgressIndicator(color: Colors.white));
+                      } else if (state is ForecastLoaded) {
+                        final forecast = state.forecast.forecast.forecastDays[selectedDayIndex];
+                        return Column(
+                          children: [
+                            const SizedBox(height: 16),
+                            // Weather condition text
+                            Text(
+                              forecast.day.condition.text ?? '',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 16),
+                            const SizedBox(height: 16),
 
-                          // Circular indicators for temperatures
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _buildCircularIndicator('Max Temp (°C)', forecast.day.maxTempC, Colors.purple),
-                              _buildCircularIndicator('Min Temp (°C)', forecast.day.minTempC, Colors.pink),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
+                            // Circular indicators for temperatures
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _buildCircularIndicator('Max Temp (°C)', forecast.day.maxTempC, Colors.purple),
+                                _buildCircularIndicator('Min Temp (°C)', forecast.day.minTempC, Colors.pink),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
 
-                          // Circular indicators for avg temp and wind
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _buildCircularIndicator('Avg Temp (°C)', forecast.day.avgTempC, Colors.blue),
-                              _buildCircularIndicator('Max Wind (km/h)', forecast.day.maxWindKph, Colors.orange),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
+                            // Circular indicators for avg temp and wind
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _buildCircularIndicator('Avg Temp (°C)', forecast.day.avgTempC, Colors.blue),
+                                _buildCircularIndicator('Max Wind (km/h)', forecast.day.maxWindKph, Colors.orange),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
 
-                          // Weather icon (sunny)
-                          const Icon(Icons.wb_sunny, size: 120, color: Colors.yellow),
-                        ],
+                            // Weather icon (sunny)
+                            GestureDetector(onTap: (){
+                              print('Prediction event dispatched');
+                              final day = forecast.day; // First day's weather
+
+                              // Condition text (Sunny/Rainy)
+                              String? conditionText =day.condition.text;
+                              int isSunny = (conditionText == 'Sunny') ? 1 : 0;
+                              int isRainy = (conditionText == 'Rainy') ? 1 : 0; // Adjust if necessary
+
+                              // Temperature
+                              double maxTempC = day.maxTempC;
+                              int isHot = (maxTempC > 25) ? 1 : 0;
+                              int isMild = (maxTempC > 20 && maxTempC <= 25) ? 1 : 0;
+
+                              // Humidity
+                              double avgHumidity = day.avgHumidity;
+                              int isNormalHumidity = (avgHumidity < 60) ? 1 : 0;
+
+                              // Combine these into a list of features
+                              List<int> features = [isRainy, isSunny, isHot, isMild, isNormalHumidity];
+
+                              // Trigger the prediction event using Bloc
+                              context.read<PredictionBloc>().add(GetPredictionEvent(features));
+
+                            },child: const Icon(Icons.wb_sunny, size: 120, color: Colors.yellow)),
+                          ],
+                        );
+                      } else if (state is ForecastError) {
+                        return Center(
+                          child: Text(
+                            state.message,
+                            style: const TextStyle(color: Colors.red, fontSize: 16),
+                          ),
+                        );
+                      }
+                      return const Text(
+                        'Enter a city to get the forecast',
+                        style: TextStyle(fontSize: 16, color: Colors.white70),
                       );
-                    } else if (state is ForecastError) {
-                      return Center(
-                        child: Text(
-                          state.message,
-                          style: const TextStyle(color: Colors.red, fontSize: 16),
-                        ),
-                      );
-                    }
-                    return const Text(
-                      'Enter a city to get the forecast',
-                      style: TextStyle(fontSize: 16, color: Colors.white70),
-                    );
-                  },
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -198,6 +235,24 @@ class _ForecastScreenState extends State<ForecastScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showPredictionDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Prediction Result'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
     );
   }
 }
