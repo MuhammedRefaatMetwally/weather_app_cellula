@@ -198,10 +198,15 @@ class Day {
   @JsonKey(name: 'mintemp_c')
   final double minTempC;
   @JsonKey(name: 'maxwind_kph')
+
   final double maxWindKph;
+
+  @JsonKey(name: 'avghumidity')
+  final double avgHumidity;
+
   final Condition condition;
 
-  Day({
+  Day(this.avgHumidity, {
     required this.maxTempC,
     required this.avgTempC,
     required this.minTempC,

@@ -2,6 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:weather/features/ai_prediction/data/PredictionRemoteDataSource.dart';
+import 'package:weather/features/ai_prediction/data/PredictionRepositoryImpl.dart';
+import 'package:weather/features/ai_prediction/domain/PredictionRepository.dart';
+import 'package:weather/features/ai_prediction/presentation/bloc/PredictionBloc.dart';
+import 'package:weather/features/ai_prediction/presentation/bloc/PredictionBloc.dart';
 import 'package:weather/features/auth/data/AuthRepositoryImpl.dart';
 import 'package:weather/features/auth/domain/repository/AuthRepository.dart';
 import 'package:weather/features/auth/domain/usecases/LoginUseCase.dart';
@@ -42,6 +47,14 @@ void setup() {
         () => ForecastRepositoryImpl(getIt<ForecastApiService>()),
   );
 
+  getIt.registerLazySingleton<PredictionRepository>(
+        () => PredictionRepositoryImpl(getIt<PredictionRemoteDataSource>()),
+  );
+  getIt.registerLazySingleton<PredictionRemoteDataSource>(
+        () => PredictionRemoteDataSourceImpl(),
+  );
+
+
   // Register use cases
   getIt.registerLazySingleton<GetCurrentLocationUseCase>(
         () => GetCurrentLocationUseCase(getIt<LocationRepository>()),
@@ -56,6 +69,10 @@ void setup() {
         () => GetForecastUseCase(getIt<ForecastRepository>()),
   );
 
+  getIt.registerLazySingleton<GetPredictionUseCase>(
+        () => GetPredictionUseCase(getIt<PredictionRepository>()),
+  );
+
   // Register BLoC
   getIt.registerFactory<LocationBloc>(
         () => LocationBloc(getCurrentLocationUseCase: getIt<GetCurrentLocationUseCase>()),
@@ -63,6 +80,10 @@ void setup() {
 
   getIt.registerFactory<ForecastBloc>(
         () => ForecastBloc(getIt<GetForecastUseCase>()),
+  );
+
+  getIt.registerFactory<PredictionBloc>(
+        () => PredictionBloc(getIt<GetPredictionUseCase>()),
   );
 
   getIt.registerFactory<AuthBloc>(
