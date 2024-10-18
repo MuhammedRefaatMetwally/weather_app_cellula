@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
-      theme: AppThemes.lightMode,sdasd
+      theme: AppThemes.lightMode,
       home: BlocProvider(
           create: (context) => getIt.get<AuthBloc>(), child: LoginScreen()),
     );
