@@ -1,6 +1,6 @@
 import '../data/models/fetch_forecast_response.dart';
 import 'entity/Forecast.dart';
 
-abstract class ForecastRepository { sada
+abstract class ForecastRepository {
   Future<FetchForecastEntity> getForecast(String city);
 }
