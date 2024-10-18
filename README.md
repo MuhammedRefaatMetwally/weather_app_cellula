@@ -66,7 +66,9 @@ The app is structured based on Clean Architecture, promoting separation of conce
 Here are a few snapshots of the app showcasing its elegant UI and beautiful icons:
 
 ![Screenshot 2024-10-19 004050](https://github.com/user-attachments/assets/325dcc60-0eed-4057-a9fb-fab255245938)
+
 ![Screenshot 2024-10-19 004020](https://github.com/user-attachments/assets/d8545dea-7b91-49e8-99d3-4a891dd466f9)
+
 ![Screenshot 2024-10-19 003936](https://github.com/user-attachments/assets/68461695-6ed3-42bf-bd50-2c86ba9785bc)
 
 
