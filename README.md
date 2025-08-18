@@ -1,12 +1,11 @@
 
 
-# Weather AI App ☀️🌧️🌍
+# Weather  App ☀️🌧️🌍
 
 Welcome to the **Weather AI App**! This app leverages AI to provide accurate weather predictions, integrates Firebase for authentication, features Google Maps for location services, and follows a clean architecture pattern. Beautiful icons and design elements are incorporated to ensure an aesthetically pleasing and user-friendly experience. Additionally, there’s a dedicated section for videos, enhancing the user interaction with dynamic content.
 
 ## Features
 
-- **AI-Powered Weather Forecasts** 🌤️: Get the latest and most accurate weather updates using advanced AI algorithms.
 - **Firebase Authentication** 🔐: Secure authentication using Firebase, enabling users to sign in with their Google or email accounts.
 - **Google Maps Integration** 📍: Seamless integration with Google Maps for location-based weather updates.
 - **Clean Architecture** 🏗️: Organized and scalable codebase built using Clean Architecture principles.
